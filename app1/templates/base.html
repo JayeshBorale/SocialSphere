@@ -1,0 +1,247 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Layout</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1c1e21;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .container {
+            display: flex;
+            width: 85%; /* Adjust the overall width */
+            margin-top: 20px;
+            justify-content: space-between; /* Spread out the content */
+        }
+        
+        .sidebar, .trending {
+            padding: 20px;
+            border-radius: 12px;
+            background-color: #242526;
+            position: sticky; /* Keeps the sidebar in place */
+            top: 20px; /* Adjusts sticky position */
+            height: calc(100vh - 40px); /* Full height minus margin */
+            overflow: auto; /* Allow scrolling if needed */
+        }
+
+        .sidebar {
+            width: 18%; /* Fixed width for left sidebar */
+        }
+        
+        .main-feed {
+            width: 58%; /* Increased width for main content */
+            height: calc(100vh - 40px); /* Set height for scrolling */
+            overflow-y: auto; /* Enable vertical scrolling */
+            padding: 20px; /* Optional padding */
+            border-radius: 12px;
+            background-color: #242526; /* Match background with sidebars */
+        }
+
+        .trending {
+            width: 24%; /* Increased width for right sidebar */
+        }
+
+        .main-feed::-webkit-scrollbar {
+            display: none; /* Hide scrollbar */
+        }
+
+        .profile-card {
+            text-align: center;
+        }
+        
+        .profile-card img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            margin-bottom: 30px;
+        }
+        
+        .follow-stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+        
+        .profile-button {
+            background-color: #3a3b3c;
+            border: none;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            text-decoration:none;
+        }
+        
+        .post-input {
+            background-color: #3a3b3c;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .post {
+            background-color: #3a3b3c;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .post-header {
+            display: flex;
+            align-items: center;
+        }
+        
+        .mini-profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .post-info h4 {
+            margin-bottom: 5px;
+        }
+        
+        .post-info span {
+            font-size: 12px;
+            color: #a3a3a3;
+        }
+        
+        .post-actions button {
+            background-color: #4e4f50;
+            border: none;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        .trending ul {
+            list-style: none;
+        }
+        
+        .trending ul li {
+            margin-bottom: 10px;
+        }
+        
+        .trending a {
+            color: #1da1f2;
+            text-decoration: none;
+        }
+
+        /* New Navbar Styles */
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            margin: 10px 0;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #fff;
+            background-color: #3a3b3c;
+            padding: 10px;
+            border-radius: 12px;
+            display: block;
+            text-align: center;
+        }
+
+        nav ul li a:hover {
+            background-color: #4e4f50;
+        }
+        button{
+            text-decoration: none;
+            color: #fff;
+            background-color: #3a3b3c;
+            padding: 10px;
+            border-radius: 12px;
+            display: block;
+            text-align: center;
+        }
+        
+    </style>
+    {% block extra_styles %}
+    {% endblock %}
+
+    {% block extra_scripts %}
+    {%endblock %}
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar -->
+        {% block leftsidebar %}
+        <div class="sidebar">
+            <!-- Search Bar -->
+           
+            <div class="profile-card">
+                {% if prof.profile_image %}
+                <img src="{{current_user.profile_image.url}}" alt="Profile Image" class="profile-pic">
+                {% else %}
+                <img src="https://tse1.mm.bing.net/th?id=OIP.y4vDl1sXQFbum_5f_WHvtgHaFR&pid=Api&P=0&h=180" alt="Profile Image" class="profile-pic">
+                {% endif %}
+                <h2>{{request.user.username}}</h2>
+                <p>@{{request.user.username}}</p><br>
+                <p>{{current_user.bio}}<br><br>
+                <div class="follow-stats">
+                    <span>followers:{{current_user.followers.count}}</span>
+                    <span>following:{{following_count}}</span>
+                </div><br>
+                <a href="{% url 'user_profile' request.user.id%}" class="profile-button">My Profile</a>
+                
+
+            </div><br>
+
+            <!-- Navigation Menu -->
+            <nav>
+                <ul>
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'profile' %}">Explore</a></li>
+                    
+                    
+
+                    
+                </ul>
+            </nav>
+        </div>
+        {% endblock %}
+
+        <!-- Main Feed Section -->
+        {% block maincontent %}
+        <div class="main-feed">
+            <!-- This is where the content will be overridden in other templates -->
+        </div>
+        {% endblock %}
+
+        <!-- Right Sidebar -->
+        {% block rightcontent %}
+        <div class="trending">
+            <h3>Notifications</h3><br><br>
+            {% for n in notify.all %}
+                {{n.body}} <br><br>
+            {% endfor %}
+            
+        </div>
+        {% endblock %}
+    </div>
+</body>
+</html>

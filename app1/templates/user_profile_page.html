@@ -1,0 +1,341 @@
+{% extends 'base.html' %}
+
+{% block maincontent %}
+<div class="profile-page">
+
+    <!-- Profile Image and Details -->
+    <div class="profile-header">
+        {% if pro.profile_image %}
+        <img src="{{pro.profile_image.url}}" alt="Profile Image" class="profile-pic-large">
+        {% else %}
+        <img src="https://tse1.mm.bing.net/th?id=OIP.y4vDl1sXQFbum_5f_WHvtgHaFR&pid=Api&P=0&h=180" alt="Profile Image" class="profile-pic-large">
+        {% endif%}
+        <!-- User information -->
+        <div class="profile-info">
+            <h2>{{ user.username }}</h2>
+            <p>@{{ user.username }}</p>
+
+            <div class="follow-info">
+                {% if pro.private_account and user != request.user and request.user not in pro.followers.all %}
+                <span style="color: white; font-weight: bold;">
+                    <strong>{{ pro.followers.count }}</strong> <a style="text-decoration:none; color: white;" href="">Followers</a>
+                </span>
+                <span style="color: white; font-weight: bold;">
+                    <strong>{{ pro.user.following.count }}</strong> <a style="text-decoration:none; color: white;" href="">Following</a>
+                </span>
+                {% else %}
+                <span style="color: white; font-weight: bold;">
+                    <strong>{{ pro.followers.count }}</strong> <a style="text-decoration:none; color: white;" href="{% url 'user_followers' pro.user.id%}">Followers</a>
+                </span>
+                <span style="color: white; font-weight: bold;">
+                    <strong>{{ pro.user.following.count }}</strong> <a style="text-decoration:none; color: white;" href="{% url 'following' pro.user.id%}">Following</a>
+                </span>
+                {% endif %}
+            </div>
+
+            <!-- Follow button -->
+            {% if user != request.user %}
+            
+                <!-- Unfollow Button -->
+                <form method="post">
+                    {% csrf_token %}
+                    {% if request.user in pro.followers.all %}
+                    <button type="submit" class="unfollow-button" name="follow_button" value="unfollow">Unfollow</button>
+                    {% else %}
+                    <button type="submit" class="follow-button" name="follow_button" value="follow">Follow</button>
+                    {% endif %}
+                </form>
+            
+                <!-- Follow Button -->
+               
+            {% else %}
+            <a class="edit-button" href="{% url 'edit_bio' %}"> Edit Profile  </a>
+            
+            
+            {% endif %}
+        
+        </div>
+    </div>
+    {% if pro.private_account and user != request.user and request.user not in pro.followers.all %}
+    <br><br><br>
+    <p style="text-align: center;     
+        font-size: 30px;          
+        font-weight: bold;        
+        color: #fff;              
+        margin-top: 20px;         
+        padding: 10px;            
+        border-radius: 8px;">Follow {{ user.username }} to view their posts 🔒</p>
+{% else %}
+    <div class="post-text">Posts by {{ user.username }}</div>
+    {% for up in user_posts %}
+    <div class="post">
+        <div class="post-header">
+            {% if up.user.first.profile and up.user.first.profile.profile_image %}
+            <img src="{{ up.user.first.profile.profile_image.url }}" alt="Profile Image" class="mini-profile-pic">
+        {% else %}
+            <img src="https://tse1.mm.bing.net/th?id=OIP.y4vDl1sXQFbum_5f_WHvtgHaFR&pid=Api&P=0&h=180" alt="Default Profile Image" class="mini-profile-pic">
+        {% endif %}
+            <div class="post-info">
+                {% if up.user.all %}
+                    <h4>{{ up.user.all.0.username }} <span>@{{ up.user.all.0.username }}</span></h4>
+                {% endif %}
+                <p>{{ up.created_at }}</p>
+            </div><br>
+        </div><br>
+         {% if up.image %}
+        <img src="{{ up.image.url }}" alt="Post Image" class="post-image" />
+        {% endif %}
+        <p>{{ up.body }}</p>
+        <div class="post-actions" style="display: flex; align-items: center; gap: 10px;">
+            <button onclick="toggleComments({{ up.id }})" class="comment-button">Comment</button>
+
+            <form method="post" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="post_id" value="{{ up.id }}">
+                {% if request.user in up.likes.all %}
+    
+                <button type="submit" class="like-button" name="like_form"  value="unlike" style="color: red;">
+                ❤️
+                </button>
+                {% else %}
+        
+                <button type="submit" class="like-button" name="like_form"  value="like" style="color: white;">
+                    🤍
+                </button>
+                 {% endif %}
+            </form>
+
+            <span style="margin-left: 10px;">{{ up.likes.count }} Likes</span>
+        </div>
+
+        <div id="comments-section-{{ up.id }}" class="comments-section" style="display: none;">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="post_id" value="{{ up.id }}">
+                <textarea name="comment_text" placeholder="Add a comment" required></textarea>
+
+                <button type="submit" name="comment_form" class="comment-button">Post Comment</button>
+            </form>
+
+            <ul>
+                {% for comment in up.comments.all %}
+                <li>@<a href="{% url 'user_profile' comment.user.id %}" style="text-decoration:none; color:white;">{{ comment.user.username }}</a>: {{ comment.text }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endfor %}
+    </div>
+    
+{% endif %}
+
+
+    
+</div>
+
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+
+/* General layout styles */
+.profile-page {
+    width: 700px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+    color: #fff;
+}
+
+/* Profile header section */
+.profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #4e4f50;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Shadow for a raised effect */
+    text-align: center;
+}
+
+/* Rectangular large profile picture */
+.profile-pic-large {
+    width: 250px;   /* Wider */
+    height: 150px;  /* Taller for rectangular look */
+    border-radius: 15px;  /* Slightly rounded corners */
+    margin-bottom: 20px;
+}
+
+/* Profile info */
+.profile-info h2 {
+    font-size: 28px;
+    margin: 0;
+}
+
+.profile-info p {
+    color: #bbb;
+    font-size: 18px;
+    margin: 5px 0;
+}
+
+.follow-info {
+    margin: 15px 0;
+    font-size: 16px;
+}
+
+.follow-info span {
+    margin-right: 20px;
+}
+
+/* Follow and unfollow button styles */
+.follow-button, .unfollow-button {
+    background-color: #1d9bf0;
+    color: #fff;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-left:50px;
+}
+
+.unfollow-button {
+    background-color: #f00;
+}
+
+.follow-button:hover, .unfollow-button:hover {
+    opacity: 0.9;
+}
+
+/* User posts section */
+.user-posts {
+    margin-top: 40px;
+}
+
+.user-posts h3 {
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+/* Individual post styling */
+.post {
+    background-color: #4e4f50;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Post image */
+.post-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.post-text {
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+.edit-button {
+    background-color: #1d9bf0;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+.edit-button:hover {
+    opacity: 0.9;
+}
+
+.post-actions {
+    margin-top: 10px;
+}
+
+.comment-button {
+    background-color: #4e4f50;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.comment-button:hover {
+    background-color: darkred;
+}
+
+
+.like-button {
+    background-color: #4e4f50;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 24px; /* Increase font size for the emoji */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px; /* Adds space between icon and text if needed */
+}
+
+.like-button .like-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Optional: Different style when button is liked */
+.like-button.liked {
+    background-color: red;
+    font-size: 16px; /* Normal font size for 'Unlike' text */
+}
+.comments-section {
+    background-color: #3a3b3c;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.comments-section textarea {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #4e4f50;
+    color: #fff;
+}
+
+.comments-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.comments-section li {
+    margin-bottom: 5px;
+}
+
+
+
+</style>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+    function toggleComments(postId) {
+        const commentsSection = document.getElementById(`comments-section-${postId}`);
+        if (commentsSection.style.display === "none") {
+            commentsSection.style.display = "block";
+        } else {
+            commentsSection.style.display = "none";
+        }
+    }
+</script>
+{% endblock %}

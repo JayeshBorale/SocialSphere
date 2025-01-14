@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block maincontent %}
+<div class="main-feed">
+    {{pro.user.username}}'s Followers 
+{% for fo in user_followers %}
+
+  
+    <br>
+    <br>
+<div class="profile-card">
+    <div class="profile-header">
+        <!-- Rectangular Profile Image -->
+        {% if fo.profile.profile_image %}
+        <img src="{{fo.profile.profile_image.url}}" alt="Profile Image" class="mini-profile-pic">
+        {% else %}
+        <img src="https://tse1.mm.bing.net/th?id=OIP.y4vDl1sXQFbum_5f_WHvtgHaFR&pid=Api&P=0&h=180" alt="Profile Image" class="mini-profile-pic">
+        {%endif %}
+        <div class="profile-info">
+            <h4>{{ fo.username }}</h4>
+            <p>@{{ fo.username }}</p>
+            <p>{{ fo.profile.bio }}</p>
+            <a href="{% url 'user_profile' fo.id %}" class="view-profile-button">View Profile</a>
+
+        </div>
+    </div>
+</div>
+
+<br>
+
+
+    <!-- Loop to display each user profile as a card -->
+
+    
+{% endfor %}
+</div>
+
+
+
+{% endblock%}
+
+{% block extra_styles %}
+<style>
+    .main-feed {
+        width: 600px;
+        margin: 0 auto;
+        font-family: Arial, sans-serif;
+        color: #fff;
+    }
+    /* Ensuring that these styles only affect the main-feed content */
+    .main-feed .profile-card {
+        background-color: #4e4f50;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Slight shadow for effect */
+        max-width: 500px; /* Reduce width of the profile card */
+        margin-left:30px;
+    }
+
+    .main-feed .profile-header {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Rectangular profile picture styles specific to main-feed */
+    .main-feed .mini-profile-pic {
+        width: 120px;
+        height: 100px; /* Make the image rectangular */
+        object-fit: cover; /* Ensures the image covers the whole area */
+        border-radius: 10px; /* Slightly rounded corners */
+        margin-right: 20px;
+    }
+
+    /* Profile information styles specific to main-feed */
+    .main-feed .profile-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .main-feed .profile-info h4 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .main-feed .profile-info p {
+        margin: 5px 0;
+        color: #ccc;
+    }
+
+    /* View Profile button styling specific to main-feed */
+    .main-feed .view-profile-button {
+        background-color: #1da1f2;
+        color: #fff;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 30px;
+        font-size: 14px;
+        cursor: pointer;
+        margin-top: 10px; /* Add space above the button */
+        text-decoration: none; 
+    }
+
+    .main-feed .view-profile-button:hover {
+        background-color: #0d8cd1;
+    }
+</style>
+{% endblock %}
